@@ -10,7 +10,7 @@ import com.jhoander.hackernews.utils.extension.setSafeOnClickListener
 import kotlinx.android.synthetic.main.item_news_list.view.*
 
 
-class NewsListAdapter :
+class NewsListAdapter constructor( val listener : (String) -> Unit):
     RecyclerView.Adapter<NewsListAdapter.ViewHolder>() {
 
     private lateinit var hits: List<Hit>
@@ -41,7 +41,7 @@ class NewsListAdapter :
 
         init {
             itemView.setSafeOnClickListener {
-
+                listener(hits[adapterPosition].story_url)
             }
         }
     }

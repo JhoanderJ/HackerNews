@@ -4,5 +4,6 @@ data class Hit(
     val title: String,
     val story_title: String,
     val author: String,
-    val created_at: String
+    val created_at: String,
+    val story_url: String
 )

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,7 +21,9 @@ import com.jhoander.hackernews.utils.base.ViewModelFactory
 import com.jhoander.hackernews.utils.base.getViewModel
 import com.jhoander.hackernews.utils.extension.showMessage
 import com.jhoander.hackernews.utils.extension.showProgress
+import kotlinx.android.synthetic.main.news_detail_fragment.*
 import kotlinx.android.synthetic.main.news_list_fragment.*
+import kotlinx.android.synthetic.main.news_list_fragment.pbNews
 
 import javax.inject.Inject
 
@@ -33,6 +36,8 @@ class NewsListFragment : Fragment() {
 
     lateinit var newsListAdapter: NewsListAdapter
 
+    var newsDetailFragment: NewsDetailFragment = NewsDetailFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependence()
@@ -43,7 +48,6 @@ class NewsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         newsRv.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
-
         viewModel.getNewsList()
     }
 
@@ -92,7 +96,6 @@ class NewsListFragment : Fragment() {
 
                     }
                 }
-
             }
             else -> {
             }
@@ -105,13 +108,31 @@ class NewsListFragment : Fragment() {
     }
 
     fun displayNews(article: Article?) {
-        newsListAdapter = NewsListAdapter()
+        newsListAdapter = NewsListAdapter {
+            changeFragment(it)
+        }
         newsRv.layoutManager = LinearLayoutManager(activity)
         newsRv.layoutManager = GridLayoutManager(context, 1)
         newsRv.adapter = newsListAdapter
         article?.let {
             newsListAdapter.setList(it.hits)
         }
+    }
+
+    private fun addFragment(fragment: Fragment?, idContainer: Int) {
+        val trans: FragmentTransaction? = parentFragmentManager.beginTransaction()
+        fragment?.let {
+            trans?.add(idContainer, it)
+        }
+        trans?.addToBackStack(null)
+        trans?.commit()
+    }
+
+    private fun changeFragment(url: String) {
+        val b = Bundle()
+        b.putString("story_url", url)
+        newsDetailFragment.setArguments(b)
+        addFragment(newsDetailFragment, R.id.fragmentContainer)
     }
 
 }
