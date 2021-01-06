@@ -12,7 +12,6 @@ class ApiService {
 
     companion object {
         fun <T> build(
-            client: OkHttpClient,
             serviceClass: Class<T>,
             urlBase: String
         ): T {
