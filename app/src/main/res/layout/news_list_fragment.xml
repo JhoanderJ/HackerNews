@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:minHeight="?attr/actionBarSize"
-            app:layout_constraintBottom_toTopOf="@+id/newsRv"
+            app:layout_constraintBottom_toTopOf="@+id/itemsSwipeToRefresh"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -48,13 +48,25 @@
             </RelativeLayout>
         </android.widget.Toolbar>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/newsRv"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/itemsSwipeToRefresh"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:splitMotionEvents="false"
-            app:layout_constraintTop_toBottomOf="@+id/tb_news"
-            tools:listitem="@layout/item_news_list" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tb_news">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/newsRv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:splitMotionEvents="false"
+                app:layout_constraintTop_toBottomOf="@+id/tb_news"
+                tools:listitem="@layout/item_news_list" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <RelativeLayout
             android:id="@+id/pbNews"

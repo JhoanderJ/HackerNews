@@ -14,17 +14,14 @@ import com.jhoander.hackernews.R
 import com.jhoander.hackernews.di.component.DaggerNewsListFragmentComponent
 import com.jhoander.hackernews.domain.model.Article
 import com.jhoander.hackernews.presentation.adapter.NewsListAdapter
-import com.jhoander.hackernews.presentation.presenter.NewsListViewModel
+import com.jhoander.hackernews.presentation.viewmodel.NewsListViewModel
 import com.jhoander.hackernews.utils.Failure
 import com.jhoander.hackernews.utils.ResourceState
 import com.jhoander.hackernews.utils.base.ViewModelFactory
 import com.jhoander.hackernews.utils.base.getViewModel
 import com.jhoander.hackernews.utils.extension.showMessage
 import com.jhoander.hackernews.utils.extension.showProgress
-import kotlinx.android.synthetic.main.news_detail_fragment.*
 import kotlinx.android.synthetic.main.news_list_fragment.*
-import kotlinx.android.synthetic.main.news_list_fragment.pbNews
-
 import javax.inject.Inject
 
 class NewsListFragment : Fragment() {
@@ -42,7 +39,6 @@ class NewsListFragment : Fragment() {
         super.onCreate(savedInstanceState)
         injectDependence()
         initViewModel()
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,16 +60,30 @@ class NewsListFragment : Fragment() {
         }
     }
 
-    fun initViewModel() {
+    private fun initViewModel() {
         viewModel = getViewModel(viewModelFactory)
         viewModel.liveData.observe(this, Observer {
             it?.also {
                 handleDogList(it.status, it.data, it.failure)
+                pullToRefresh()
             }
         })
     }
 
-    fun handleDogList(status: ResourceState, data: Article?, failure: Failure?) {
+    private fun pullToRefresh() {
+        itemsSwipeToRefresh.setOnRefreshListener {
+            viewModel.getNewsList()
+            viewModel = getViewModel(viewModelFactory)
+            viewModel.liveData.observe(this, Observer {
+                it?.also {
+                    handleDogList(it.status, it.data, it.failure)
+                    itemsSwipeToRefresh.isRefreshing = false
+                }
+            })
+        }
+    }
+
+    private fun handleDogList(status: ResourceState, data: Article?, failure: Failure?) {
         when (status) {
             ResourceState.LOADING -> {
                 pbNews.showProgress(true, activity)
@@ -93,7 +103,6 @@ class NewsListFragment : Fragment() {
                     Failure.ServerError -> {
                         pbNews.showProgress(false, activity)
                         showMessage((failure as Failure.Error).errorMessage, context)
-
                     }
                 }
             }
@@ -107,13 +116,14 @@ class NewsListFragment : Fragment() {
         DaggerNewsListFragmentComponent.builder().build().inject(this)
     }
 
-    fun displayNews(article: Article?) {
+    private fun displayNews(article: Article?) {
         newsListAdapter = NewsListAdapter {
             changeFragment(it)
         }
         newsRv.layoutManager = LinearLayoutManager(activity)
         newsRv.layoutManager = GridLayoutManager(context, 1)
         newsRv.adapter = newsListAdapter
+
         article?.let {
             newsListAdapter.setList(it.hits)
         }

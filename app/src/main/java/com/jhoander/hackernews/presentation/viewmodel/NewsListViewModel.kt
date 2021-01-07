@@ -1,4 +1,4 @@
-package com.jhoander.hackernews.presentation.presenter
+package com.jhoander.hackernews.presentation.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
