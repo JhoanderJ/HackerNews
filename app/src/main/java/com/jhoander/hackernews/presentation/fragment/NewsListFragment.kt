@@ -64,7 +64,7 @@ class NewsListFragment : Fragment() {
         viewModel = getViewModel(viewModelFactory)
         viewModel.liveData.observe(this, Observer {
             it?.also {
-                handleDogList(it.status, it.data, it.failure)
+                handleNewsList(it.status, it.data, it.failure)
                 pullToRefresh()
             }
         })
@@ -76,14 +76,14 @@ class NewsListFragment : Fragment() {
             viewModel = getViewModel(viewModelFactory)
             viewModel.liveData.observe(this, Observer {
                 it?.also {
-                    handleDogList(it.status, it.data, it.failure)
+                    handleNewsList(it.status, it.data, it.failure)
                     itemsSwipeToRefresh.isRefreshing = false
                 }
             })
         }
     }
 
-    private fun handleDogList(status: ResourceState, data: Article?, failure: Failure?) {
+    private fun handleNewsList(status: ResourceState, data: Article?, failure: Failure?) {
         when (status) {
             ResourceState.LOADING -> {
                 pbNews.showProgress(true, activity)
