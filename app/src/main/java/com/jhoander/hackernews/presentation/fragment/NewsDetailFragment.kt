@@ -48,8 +48,8 @@ class NewsDetailFragment : Fragment() {
             }
         }
         webView.loadUrl(url)
-        iv_back.setOnClickListener {
-            fragmentManager?.popBackStack()
+        ivBack.setOnClickListener {
+            parentFragmentManager?.popBackStack()
         }
 
     }

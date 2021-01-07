@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.jhoander.hackernews.R
 import com.jhoander.hackernews.di.component.DaggerNewsListFragmentComponent
 import com.jhoander.hackernews.domain.model.Article
+import com.jhoander.hackernews.domain.model.Hit
 import com.jhoander.hackernews.presentation.adapter.NewsListAdapter
+import com.jhoander.hackernews.presentation.utils.SwipeToDeleteCallBack
 import com.jhoander.hackernews.presentation.viewmodel.NewsListViewModel
 import com.jhoander.hackernews.utils.Failure
 import com.jhoander.hackernews.utils.ResourceState
@@ -24,6 +27,7 @@ import com.jhoander.hackernews.utils.extension.showProgress
 import kotlinx.android.synthetic.main.news_list_fragment.*
 import javax.inject.Inject
 
+
 class NewsListFragment : Fragment() {
 
     @Inject
@@ -33,7 +37,9 @@ class NewsListFragment : Fragment() {
 
     lateinit var newsListAdapter: NewsListAdapter
 
-    var newsDetailFragment: NewsDetailFragment = NewsDetailFragment()
+    private var newsDetailFragment: NewsDetailFragment = NewsDetailFragment()
+
+    private lateinit var hitsAux: ArrayList<Hit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,9 +47,9 @@ class NewsListFragment : Fragment() {
         initViewModel()
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        newsRv.addItemDecoration(DividerItemDecoration(activity, LinearLayoutManager.VERTICAL))
         viewModel.getNewsList()
     }
 
@@ -112,6 +118,19 @@ class NewsListFragment : Fragment() {
 
     }
 
+    private fun enableSwipeToDelete(recyclerView: RecyclerView) {
+        val swipeToDeleteCallback = object : SwipeToDeleteCallBack() {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.adapterPosition
+                hitsAux.removeAt(pos)
+                newsListAdapter.notifyDataSetChanged()
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
     private fun injectDependence() {
         DaggerNewsListFragmentComponent.builder().build().inject(this)
     }
@@ -123,9 +142,13 @@ class NewsListFragment : Fragment() {
         newsRv.layoutManager = LinearLayoutManager(activity)
         newsRv.layoutManager = GridLayoutManager(context, 1)
         newsRv.adapter = newsListAdapter
+        enableSwipeToDelete(newsRv)
 
         article?.let {
-            newsListAdapter.setList(it.hits)
+            hitsAux = ArrayList()
+            hitsAux.addAll(it.hits)
+            newsListAdapter.setList(hitsAux)
+
         }
     }
 
@@ -141,7 +164,7 @@ class NewsListFragment : Fragment() {
     private fun changeFragment(url: String) {
         val b = Bundle()
         b.putString("story_url", url)
-        newsDetailFragment.setArguments(b)
+        newsDetailFragment.arguments = b
         addFragment(newsDetailFragment, R.id.fragmentContainer)
     }
 

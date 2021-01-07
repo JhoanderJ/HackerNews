@@ -10,7 +10,7 @@ import com.jhoander.hackernews.utils.extension.setSafeOnClickListener
 import kotlinx.android.synthetic.main.item_news_list.view.*
 
 
-class NewsListAdapter constructor( val listener : (String) -> Unit):
+class NewsListAdapter constructor(val listener: (String) -> Unit) :
     RecyclerView.Adapter<NewsListAdapter.ViewHolder>() {
 
     private lateinit var hits: List<Hit>
@@ -26,10 +26,7 @@ class NewsListAdapter constructor( val listener : (String) -> Unit):
     }
 
     override fun onBindViewHolder(holder: NewsListAdapter.ViewHolder, position: Int) {
-        holder.itemView.newsTitle.text = hits[position].title
-        holder.itemView.newsTitle.text = hits[position].story_title
-        holder.itemView.newsAuthor.text = hits[position].author
-        holder.itemView.newsCreatedAt.text = hits[position].created_at
+        holder.initView(hits[position], position)
     }
 
     fun setList(hits: List<Hit>) {
@@ -38,11 +35,24 @@ class NewsListAdapter constructor( val listener : (String) -> Unit):
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        init {
-            itemView.setSafeOnClickListener {
-                listener(hits[adapterPosition].story_url)
+        fun initView(item: Hit?, pos: Int) {
+            if (item == null) {
+                itemView.visibility = View.GONE
+                return
             }
+            itemView.newsTitle.text = item.title
+            itemView.newsTitle.text = item.story_title
+            itemView.newsAuthor.text = item.author
+            itemView.newsCreatedAt.text = item.created_at
+
+            itemView.setSafeOnClickListener {
+                //TODO For cases in which the story_url field is null, it will not be possible to view detail in WebView
+                hits[adapterPosition].story_url?.let { view ->
+                    listener(view)
+                }
+            }
+
         }
+
     }
 }
