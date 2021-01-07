@@ -23,24 +23,26 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/iv_back"
+                android:id="@+id/ivBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:background="@drawable/icon_back_item_car"
+                android:background="@drawable/icon_back"
                 android:padding="10dp" />
 
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="50dp"
-                android:layout_marginLeft="25dp"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="News Android"
+                android:text="@string/detail_news_android"
                 android:textColor="#FAF7F8"
                 android:textSize="20sp" />
 
